@@ -100,8 +100,15 @@ const apiCall = axios.create({
     baseURL:  'http://localhost:4000',
     headers: {'Authorization':'Bearer 33b55673-57c7-413f-83ed-5b4ae8d18827'},
   });
+//   const get = (key)=> {
+//     return JSON.parse(localStorage.getItem(key));
+// }
+  const set = (key,value) => {
+      return JSON.stringify(localStorage.setItem(key,value))
+  }
 
-
+  let d = new Date();
+  let m = d.getMonth();
 export default class SnackVoting extends Component {
     constructor(props){
         super(props);
@@ -112,14 +119,6 @@ export default class SnackVoting extends Component {
             votes: 3,
             selected: 0
         }
-    }
-
-    storageInvalidator = (month)=>{
-        let d = new Date();
-        let m = d.getMonth();
-        console.log(m);
-        let clearData = m > month? true:false
-        return clearData
     }
     
 
@@ -135,20 +134,25 @@ export default class SnackVoting extends Component {
                id:id,
                brand:brand,
                product:product,
-               votes:votes
+               votes:votes+1
            }
+        //    Get the current list of items and sort the new item alphabetically within it
            let sortedSelectedItems = (arr,newItem)=>{
                 let newArr =[...arr,newItem].sort((a,b) => {
                     return a.brand.localeCompare(b.brand);
                 });
                 return newArr;
            }
+           
            this.setState(prevState => ( {
                 selectedItems:[...sortedSelectedItems(prevState.selectedItems,votedItem)],
                 votes: prevState.votes -1,
                 selected: prevState.selected +1,
                 items:[...sortedItems]}
                 ))
+                
+                localStorage.setItem('selection',JSON.stringify([...new Set(this.state.selectedItems)]))
+                
                 if(localStorage.getItem("votes")!= null){
                     localStorage.setItem("votes",Number(localStorage.getItem("votes"))+1);
                 }else{
@@ -156,9 +160,7 @@ export default class SnackVoting extends Component {
                 }
                 
                 if(this.state.votes === 0){
-                    let d = new Date();
-                    let m = d.getMonth();
-                    localStorage.setItem("canVote","false")
+                    localStorage.setItem("noVote","true")
                     localStorage.setItem("m",m)
                 }
         }else{
@@ -170,15 +172,25 @@ export default class SnackVoting extends Component {
    async componentDidMount(){
        // Get all items from the DB and set state. Hide the loader when everything has been updated. 
     let items = await apiCall.get('/snacks');
-    
-    console.log(items.data);
+ 
+    if(localStorage.noVote === "true" && localStorage.m < m){
+        let storageKeys = ["votes","m","selection"]
+        storageKeys.map(key=>{
+           return localStorage.removeItem(key);
+        })
+        set("noVote","false");
+        
+    }
     setTimeout(()=>{
       if(items.data){
         let sortedItems = items.data.sort( (a,b) => {
             return b.votes - a.votes 
         })
-        
-        this.setState(prevState => (items.data !== prevState.items?{ items: sortedItems,loading:"false",selected:localStorage.votes !=null?localStorage.votes:0 }:false));
+        let parsedData = localStorage.selection? JSON.parse(localStorage.selection):false;
+        this.setState(prevState => (
+            items.data !== prevState.items?{ items: sortedItems,loading:"false",selected:localStorage.votes !=null?localStorage.votes:0,
+            votes:localStorage.votes? prevState.votes - localStorage.votes:3,
+            selectedItems:parsedData?[...parsedData]:[] }:false));
       }
     },0)
    }
@@ -190,7 +202,12 @@ export default class SnackVoting extends Component {
             )
         });
         let selectionList = this.state.selectedItems.map(item => {
-           return  <div key={item.id} className="selection_item"> {item.brand} {item.product} <span style={{paddingRight:`0`}}className="vote">{item.votes}</span></div>
+            if(item === undefined || item === null){
+                return console.error("item undefined")
+            }else{
+                return  <div key={item.id} className="selection_item"> {item.brand} {item.product} <span style={{paddingRight:`0`}}className="vote">{item.votes}</span></div>
+            }
+           
            
         })
         
