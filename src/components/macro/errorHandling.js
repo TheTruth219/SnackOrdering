@@ -8,7 +8,7 @@ const checkRequests= Wrapped => {
             axios.interceptors.response.use(response =>{
                 // Do something with response data
                 console.log(response);
-                return response;
+                
             },  error => {
                 switch (error.response.status) {
                     case 503 :

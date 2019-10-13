@@ -132,7 +132,8 @@ export default class SnackVoting extends Component {
             selectedItems:[],
             loading:true,
             votes: 3,
-            selected: 0
+            selected: 0,
+            error:false
         }
     }
     
@@ -221,6 +222,8 @@ export default class SnackVoting extends Component {
             items.data !== prevState.items?{ items: sortedItems,loading:"false",selected:localStorage.votes !=null?localStorage.votes:0,
             votes:localStorage.votes? prevState.votes - localStorage.votes:3,
             selectedItems:parsedData?[...parsedData]:[] }:false));
+      }else{
+          this.setState({error:"true"})
       }
    
    }
@@ -244,14 +247,26 @@ export default class SnackVoting extends Component {
         return (
             <>
               <VoteContainer id="vote" className="u-constrainer">
-                  <h1 className="hdg hdg_2 mix-hdg_dark">Snack Voting</h1>
-                  <h3 className="copy">Vote on the snacks you want to see in this month's rotation</h3>
+                  
+                        {
+                          foodList.length > 0?
+                          <>
+                          <h1 className="hdg hdg_2 mix-hdg_dark">Snack Voting</h1>
+                          <h3 className="copy">Vote on the snacks you want to see in this month's rotation</h3>
+                          </>
+                            :
+                            <>
+                            <h1 className="hdg hdg_2 mix-hdg_dark">Under Maintenance</h1>
+                            <h3 className="copy">Please check back later to vote on the snacks you want </h3>
+                            </>
+                         }
+                  
                   <hr/>
                   <p style={{fontSize:`16px`, 
     marginBottom:`2em`}} className="copy">{this.state.votes === 0?<span style={{color:`red`,fontWeight:`bold`}}>You have no votes remaining this month</span>:`${this.state.votes} Votes Remaining`} </p>
                   <div className="votingContainer">
                       <div className="item_list">
-                          <h3 className="copy">Available Items <span className="bubble">{this.state.items.length}</span></h3>
+                         <h3 className="copy">Available Items <span className="bubble">{this.state.items.length}</span></h3>
                           <div className="item_list__container">
                           {foodList}
                           </div>

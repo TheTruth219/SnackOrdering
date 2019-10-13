@@ -80,8 +80,18 @@ export default class CurrentSnacks extends Component {
         return (
             
               <SnacksContainer id="current" >
-                  <h1 className="hdg hdg_2 mix-hdg_dark">Currently In Stock</h1>
-                  <h3 className="copy">Here are the snacks that are available in the Nerdery kitchen now.</h3>
+                  {Tiles.length > 0? 
+                    <>
+                        <h1 className="hdg hdg_2 mix-hdg_dark">Currently In Stock</h1>
+                        <h3 className="copy">Here are the snacks that are available in the Nerdery kitchen now.</h3>
+                    </>
+                    :
+                    <>
+                        <h1 className="hdg hdg_2 mix-hdg_dark">No Snacks In Stock!</h1>
+                        <h3 className="copy">Kidding! We're just doing some quick maintenance. Be back shortly!</h3>
+                    </>
+                    }
+                  
                   
                   <div className="container">
                      {Tiles} 
