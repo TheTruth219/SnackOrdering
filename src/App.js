@@ -1,5 +1,6 @@
 import React from 'react';
 import SnackVoting from './components/SnackVoting'
+import checkRequests from './components/macro/errorHandling'
 import "./assets/styles/styles.css"
 
 
@@ -11,4 +12,4 @@ function App() {
   );
 }
 
-export default App;
+export default checkRequests (App);

@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import styled from '@emotion/styled';
 import axios from 'axios';
-import FoodItem from './micro/FoodItem';
 
-const VoteContainer = styled.section`
+const SnacksContainer = styled.section`
 display:flex;
 flex-direction:column;
 align-items:center;
@@ -35,8 +34,6 @@ p{
     font-size: 26px;
     margin-right:10px;
     font-weight:bold;
-    cursor:pointer;
-
 }
 .bubble {
     background: #fff;
@@ -104,87 +101,22 @@ const apiCall = axios.create({
     baseURL:  'http://localhost:4000',
     headers: {'Authorization':'Bearer 33b55673-57c7-413f-83ed-5b4ae8d18827'},
   });
-//   const get = (key)=> {
-//     return JSON.parse(localStorage.getItem(key));
-// }
+
   const set = (key,value) => {
       return JSON.stringify(localStorage.setItem(key,value))
   }
 
-  let d = new Date();
-  let m = d.getMonth();
 export default class SnackVoting extends Component {
     constructor(props){
         super(props);
         this.state={
-            items:[],
-            selectedItems:[],
-            loading:true,
-            votes: 3,
-            selected: 0
+            items:[], 
         }
     }
     
-
-    addVote = async ({id,brand,product,votes}) => {
+   
         
-        if(this.state.votes > 0 && this.state.selected < 3){
-            if(localStorage.votes === undefined || Number(localStorage.votes) < 3){
-                await apiCall.post(`/snacks/vote/${id}`)
-                let newItems = await apiCall.get('/snacks');
-                let sortedItems = newItems.data.sort( (a,b) => {
-                return  b.votes - a.votes 
-                })
-                let votedItem = {
-                    id:id,
-                    brand:brand,
-                    product:product,
-                    votes:votes+1
-                }
-                   //    Get the current list of items and sort the new item alphabetically within it
-                   let sortedSelectedItems = (arr,newItem)=>{
-                    let newArr =[...arr,newItem].sort((a,b) => {
-                        return a.brand.localeCompare(b.brand);
-                    });
-                    return newArr;
-               }
-               
-               this.setState(prevState => ( {
-                    selectedItems:[...sortedSelectedItems(prevState.selectedItems,votedItem)],
-                    votes: prevState.votes -1 >= 0 ? prevState.votes -1 : 0,
-                    selected: prevState.selected +1 <= 3? prevState.selected +1:3,
-                    items:[...sortedItems]}
-                    ))
-
-
-            }
-            
-
-                let parsedData = localStorage.selection? [...JSON.parse(localStorage.selection)]:[];
-
-                // Prevent people from voting multiple times from other tabs
-                if(parsedData.length < 3 || parsedData.length === undefined){
-                    localStorage.setItem('selection',JSON.stringify([...new Set(this.state.selectedItems)]))
-                }else{
-                    console.log("Maximum vote exceeded")
-                }
-                
-                
-                if(localStorage.votes!= null && Number(localStorage.votes)<=3 ){
-                    localStorage.setItem("votes",Number(localStorage.getItem("votes"))+1);
-                }else{
-                    localStorage.setItem("votes",1);
-                }
-                
-                if(this.state.votes <= 0){
-                    localStorage.setItem("noVote","true")
-                    localStorage.setItem("m",m)
-                }
-        }else{
-            return false
-        }
-        
-    }
+    
     // ******************** GET SNACK INFORMATION ************************
    async componentDidMount(){
        // Get all items from the DB and set state. Hide the loader when everything has been updated. 
@@ -218,11 +150,11 @@ export default class SnackVoting extends Component {
                 <FoodItem index={index} handleVote={this.addVote} key={item.id} data={item} />                                          
             )
         });
-        let selectionList = this.state.selectedItems.map((item,index) => {
+        let selectionList = this.state.selectedItems.map(item => {
             if(item === undefined || item === null){
                 return console.error("item undefined")
             }else{
-                return  <div key={index} className="selection_item"> {item.brand} {item.product} <span style={{paddingRight:`0`}}className="vote">{item.votes}</span></div>
+                return  <div key={item.id} className="selection_item"> {item.brand} {item.product} <span style={{paddingRight:`0`}}className="vote">{item.votes}</span></div>
             }
            
            
@@ -230,7 +162,7 @@ export default class SnackVoting extends Component {
         
         return (
             <>
-              <VoteContainer id="vote" className="u-constrainer">
+              <VoteContainer className="u-constrainer">
                   <h1 className="hdg hdg_2 mix-hdg_dark">Snack Voting</h1>
                   <h3 className="copy">Vote on the snacks you want to see in this month's rotation</h3>
                   <hr/>
