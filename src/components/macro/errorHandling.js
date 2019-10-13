@@ -13,7 +13,9 @@ const checkRequests= Wrapped => {
                 switch (error.response.status) {
                     case 503 :
                         // Render Maintenance message
-                        return <Loader loading="true" src="https://8bitjohn.com/wp-content/uploads/2019/09/maintenance.gif"/>
+                        return <Loader loading="true" src="https://8bitjohn.com/wp-content/uploads/2019/09/maintenance.gif">
+                                <h1 style={{marginTop:`4em`,fontSize:`40px`,alignSelf:`center`,position:`absolute`,top:`70vh`}}>We'll be back shortly....</h1>
+                                </Loader>
                                 
                     default :
                         break
@@ -23,9 +25,12 @@ const checkRequests= Wrapped => {
             });
         })
 
-        return (        
+        return (  
+                 
                 <Wrapped {...props} />
-        )
+                
+            
+        )   
     }
     return CheckRequests
 }

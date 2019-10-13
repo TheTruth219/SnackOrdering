@@ -19,11 +19,11 @@ img{
 }
 `
 
-export default function Loader({loading,src}) {
+export default function Loader({loading,src,children}) {
     return (
         <Container loading={loading}>
-            <img height="1000px" width="1000px" alt="loading" src={src}/>
-            <h1 style={{marginTop:`4em`,fontSize:`40px`,alignSelf:`center`,position:`absolute`,top:`70vh`}}>We'll be back shortly....</h1>
+            <img height="500px" width="500px" alt="loading" src={src}/>
+            {children}
 
         </Container>
     )

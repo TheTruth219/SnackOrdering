@@ -8,7 +8,7 @@ display:flex;
 flex-direction:column;
 align-items:center;
 h1 {
-    margin:.6em;
+    margin:.6em .6em 0;
 }
 h3 {
     text-align:center;
@@ -88,6 +88,7 @@ p{
     min-height: 42px;
     display: flex;
     align-items: center;
+    color:#828282;
 }
 .selection_list{
     width:420px;
@@ -99,14 +100,24 @@ p{
         flex-direction:row;
     }
 }
+@media screen and (max-width: 580px){
+    .item_list {
+        width:100vw;
+        margin-left:0;
+
+    }
+    .selection_list{
+        width:95vw;
+        margin-left:0;
+        padding:0 10px;
+    }
+} 
 `
 const apiCall = axios.create({
     baseURL:  'http://localhost:4000',
     headers: {'Authorization':'Bearer 33b55673-57c7-413f-83ed-5b4ae8d18827'},
   });
-//   const get = (key)=> {
-//     return JSON.parse(localStorage.getItem(key));
-// }
+
   const set = (key,value) => {
       return JSON.stringify(localStorage.setItem(key,value))
   }
@@ -127,14 +138,18 @@ export default class SnackVoting extends Component {
     
 
     addVote = async ({id,brand,product,votes}) => {
-        
+        // if user has more than 0 votes left and have selected less than 3 items proceed
         if(this.state.votes > 0 && this.state.selected < 3){
+            // if localStorage data isn't defined, define it. If it IS defined and there are less than 3 votes proceed
             if(localStorage.votes === undefined || Number(localStorage.votes) < 3){
                 await apiCall.post(`/snacks/vote/${id}`)
+                //Post data and immediately retrieve it to update component
                 let newItems = await apiCall.get('/snacks');
+                // Sort items by vote
                 let sortedItems = newItems.data.sort( (a,b) => {
                 return  b.votes - a.votes 
                 })
+                // Define the item
                 let votedItem = {
                     id:id,
                     brand:brand,
@@ -156,9 +171,7 @@ export default class SnackVoting extends Component {
                     items:[...sortedItems]}
                     ))
 
-
             }
-            
 
                 let parsedData = localStorage.selection? [...JSON.parse(localStorage.selection)]:[];
 
@@ -198,7 +211,7 @@ export default class SnackVoting extends Component {
         set("noVote","false");
         
     }
-    setTimeout(()=>{
+   
       if(items.data){
         let sortedItems = items.data.sort( (a,b) => {
             return b.votes - a.votes 
@@ -209,7 +222,7 @@ export default class SnackVoting extends Component {
             votes:localStorage.votes? prevState.votes - localStorage.votes:3,
             selectedItems:parsedData?[...parsedData]:[] }:false));
       }
-    },0)
+   
    }
    
     render() {
@@ -222,7 +235,7 @@ export default class SnackVoting extends Component {
             if(item === undefined || item === null){
                 return console.error("item undefined")
             }else{
-                return  <div key={index} className="selection_item"> {item.brand} {item.product} <span style={{paddingRight:`0`}}className="vote">{item.votes}</span></div>
+                return  <div  key={index} className="selection_item"> {item.brand} {item.product} <span style={{paddingRight:`0`}}className="vote">{item.votes}</span></div>
             }
            
            
