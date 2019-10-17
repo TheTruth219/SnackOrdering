@@ -11,23 +11,25 @@ class App extends Component{
   constructor(props){
     super(props);
     this.state={
-      loading:"true"
+      loading:1
     }
   }
   componentDidMount(){
+
     setTimeout(() => {
-      this.setState({loading:"false"})
+      this.setState({loading:0})
     },1000)
   }
 
   render(){
+
     return (
       <div className="App">
        <CurrentSnacks/>
        <SnackVoting/>
        <Loader loading={this.state.loading} src="https://8bitjohn.com/wp-content/uploads/2019/09/maintenance.gif">
-                                <h1 style={{marginTop:`2em`,fontSize:`40px`,alignSelf:`center`,position:`absolute`,top:`70vh`}}>Loading.....</h1>
-                                </Loader>
+            <h1 style={{marginTop:`2em`,fontSize:`40px`,alignSelf:`center`,position:`absolute`,top:`70vh`}}>Loading.....</h1>
+       </Loader>
       </div>
     );
   }

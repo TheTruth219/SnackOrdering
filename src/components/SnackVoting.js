@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styled from '@emotion/styled';
-import axios from 'axios';
+import calls from '../Connections';
 import FoodItem from './micro/FoodItem';
 
 const VoteContainer = styled.section`
@@ -113,24 +113,21 @@ p{
     }
 } 
 `
-const apiCall = axios.create({
-    baseURL:  'http://localhost:4000',
-    headers: {'Authorization':'Bearer 33b55673-57c7-413f-83ed-5b4ae8d18827'},
-  });
+
 
   const set = (key,value) => {
-      return JSON.stringify(localStorage.setItem(key,value))
+      return JSON.stringify(localStorage.setItem(key,value));
   }
 
+
   let d = new Date();
-  let m = d.getMonth();
+  let month = d.getMonth();
 export default class SnackVoting extends Component {
     constructor(props){
         super(props);
         this.state={
             items:[],
             selectedItems:[],
-            loading:true,
             votes: 3,
             selected: 0,
             error:false
@@ -143,9 +140,9 @@ export default class SnackVoting extends Component {
         if(this.state.votes > 0 && this.state.selected < 3){
             // if localStorage data isn't defined, define it. If it IS defined and there are less than 3 votes proceed
             if(localStorage.votes === undefined || Number(localStorage.votes) < 3){
-                await apiCall.post(`/snacks/vote/${id}`)
+                await calls.api.post(`${id}`)
                 //Post data and immediately retrieve it to update component
-                let newItems = await apiCall.get('/snacks');
+                let newItems = await calls.api.get;
                 // Sort items by vote
                 let sortedItems = newItems.data.sort( (a,b) => {
                 return  b.votes - a.votes 
@@ -174,11 +171,11 @@ export default class SnackVoting extends Component {
 
             }
 
-                let parsedData = localStorage.selection? [...JSON.parse(localStorage.selection)]:[];
+                let parsedData = localStorage.selection? [...calls.local.get('selection')]:[];
 
                 // Prevent people from voting multiple times from other tabs
                 if(parsedData.length < 3 || parsedData.length === undefined){
-                    localStorage.setItem('selection',JSON.stringify([...new Set(this.state.selectedItems)]))
+                    calls.local.set('selection',JSON.stringify([...new Set(this.state.selectedItems)]))
                 }else{
                     console.log("Maximum vote exceeded")
                 }
@@ -192,7 +189,7 @@ export default class SnackVoting extends Component {
                 
                 if(this.state.votes <= 0){
                     localStorage.setItem("noVote","true")
-                    localStorage.setItem("m",m)
+                    localStorage.setItem("m",month)
                 }
         }else{
             return false
@@ -202,9 +199,9 @@ export default class SnackVoting extends Component {
     // ******************** GET SNACK INFORMATION ************************
    async componentDidMount(){
        // Get all items from the DB and set state. Hide the loader when everything has been updated. 
-    let items = await apiCall.get('/snacks');
+    let items = await calls.api.get;
  
-    if(localStorage.noVote === "true" && localStorage.m < m){
+    if(localStorage.noVote === "true" && localStorage.m < month){
         let storageKeys = ["votes","m","selection"]
         storageKeys.map(key=>{
            return localStorage.removeItem(key);
@@ -217,11 +214,17 @@ export default class SnackVoting extends Component {
         let sortedItems = items.data.sort( (a,b) => {
             return b.votes - a.votes 
         })
-        let parsedData = localStorage.selection? JSON.parse(localStorage.selection):false;
+        let parsedData = localStorage.selection ? calls.local.get('selection'):false;
         this.setState(prevState => (
-            items.data !== prevState.items?{ items: sortedItems,loading:"false",selected:localStorage.votes !=null?localStorage.votes:0,
-            votes:localStorage.votes? prevState.votes - localStorage.votes:3,
-            selectedItems:parsedData?[...parsedData]:[] }:false));
+            items.data !== prevState.items ? 
+            { items: sortedItems,
+              loading:"false",
+              selected:localStorage.votes !=null?localStorage.votes:0,
+              votes:localStorage.votes? 
+                prevState.votes - localStorage.votes:3,
+              selectedItems:parsedData?
+                [...parsedData]:[] 
+            }:false));
       }else{
           this.setState({error:"true"})
       }

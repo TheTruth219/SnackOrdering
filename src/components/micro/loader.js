@@ -6,9 +6,9 @@ position: fixed;
 top:0;
 background:white;
 ${props =>
-  props.loading==="true"?`opacity:1;`:`opacity:0;`}
+  props.loading===1?`opacity:1;`:`opacity:0;`}
 ${props =>
-  props.loading==="true"?`z-index:10;`:`z-index: -5;`}
+  props.loading===1?`z-index:10;`:`z-index: -5;`}
 height: 100%;
 width: 100%;
 display: flex;
@@ -31,3 +31,5 @@ export default function Loader({loading,src,children}) {
         </Container>
     )
 }
+
+

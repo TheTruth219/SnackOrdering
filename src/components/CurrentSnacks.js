@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import styled from '@emotion/styled';
-import geo from '../assets/media/images/geo.jpg'
-import axios from 'axios';
+import geo from '../assets/media/images/geo.jpg';
 import FoodTile from './micro/FoodTile';
-
+import calls from '../Connections';
 
 const whiteText = "#ffffffba"
 const SnacksContainer = styled.section`
@@ -39,10 +38,6 @@ p{
 }
 
 `
-const apiCall = axios.create({
-    baseURL:  'http://localhost:4000',
-    headers: {'Authorization':'Bearer 33b55673-57c7-413f-83ed-5b4ae8d18827'},
-  });
 
 
 export default class CurrentSnacks extends Component {
@@ -59,7 +54,7 @@ export default class CurrentSnacks extends Component {
     // ******************** GET SNACK INFORMATION ************************
    async componentDidMount(){
        // Get all items from the DB and set state. Hide the loader when everything has been updated. 
-    let items = await apiCall.get('/snacks');
+    let items = await calls.api.get;
  
     if(items.data){
         this.setState({
